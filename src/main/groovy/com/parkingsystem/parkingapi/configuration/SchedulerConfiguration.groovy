@@ -11,7 +11,7 @@ import java.util.concurrent.Executors
 @Configuration
 class SchedulerConfiguration {
 
-    @Value("${scheduler.jdbc.thread-pool-size}")
+    @Value('${scheduler.jdbc.thread-pool-size}')
     Integer threadPoolSize
 
     @Bean
