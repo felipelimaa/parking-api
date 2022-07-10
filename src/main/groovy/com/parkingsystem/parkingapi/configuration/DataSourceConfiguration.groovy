@@ -1,0 +1,31 @@
+package com.parkingsystem.parkingapi.configuration
+
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.core.env.Environment
+
+import javax.sql.DataSource
+
+@Configuration
+class DataSourceConfiguration {
+
+    @Autowired
+    Environment environment
+
+    @Primary
+    @Bean(name = "parkingDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.parking-api")
+    DataSource dataSource() {
+        HikariConfig config = new HikariConfig()
+        config.setJdbcUrl(environment.getProperty("spring.datasource.url"))
+        config.setUsername(environment.getProperty("spring.datasource.username"))
+        config.setPassword(environment.getProperty("spring.datasource.password"))
+        new HikariDataSource(config)
+    }
+
+}
