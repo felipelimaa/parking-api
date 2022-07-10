@@ -6,7 +6,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=parkingPass
       - MYSQL_USER=parkingUser
-      - MYQSL_PASSWORD=parkingPass
+      - MYSQL_PASSWORD=parkingPass
       - MYSQL_DATABASE=dbParking
     ports:
       - "3306:3306"
