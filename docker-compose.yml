@@ -1,0 +1,17 @@
+version: '3'
+services:
+  mysql:
+    platform: linux/x86_64
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=parkingPass
+      - MYSQL_USER=parkingUser
+      - MYQSL_PASSWORD=parkingPass
+      - MYSQL_DATABASE=dbParking
+    ports:
+      - "3306:3306"
+    networks:
+      - mysql-network
+networks:
+  mysql-network:
+    driver: bridge
