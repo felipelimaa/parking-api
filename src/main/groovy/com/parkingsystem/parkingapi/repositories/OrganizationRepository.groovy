@@ -3,6 +3,7 @@ package com.parkingsystem.parkingapi.repositories
 import com.parkingsystem.parkingapi.configuration.DatasourceProvider
 import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.infrastructure.exceptions.InternalServerException
+import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationCountRowMapper
@@ -24,6 +25,7 @@ import java.util.concurrent.Callable
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_FINDING_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_GENERATE_ORGANIZATION_ID
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_REGISTER_ORGANIZATION
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ORGANIZATION_NOT_FOUND
 
 @Component
 class OrganizationRepository {
@@ -83,6 +85,18 @@ class OrganizationRepository {
             Organizations o
     '''
 
+    static final String FIND_BY_ID = '''
+        SELECT
+            o.Organization_ID,
+            o.Name,
+            o.Cost,
+            o.MaximumCapacity
+        FROM
+            Organizations o
+        WHERE
+            Organization_ID = :Organization_ID
+    '''
+
     Mono<String> registerOrganization(String name, BigDecimal cost, Integer maximumCapacity) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
@@ -114,6 +128,28 @@ class OrganizationRepository {
             } catch (Exception e) {
                 logger.createMessage("${this.class.simpleName}.findAll", ERROR_WHILE_FINDING_ORGANIZATION.message)
                     .error(e)
+
+                throw new InternalServerException(ERROR_WHILE_FINDING_ORGANIZATION)
+            }
+        }
+    }
+
+    Mono<Organization> findById(String organizationId) {
+        async {
+            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+            def params = [
+                Organization_ID: organizationId
+            ]
+            try {
+                jdbcTemplate.queryForObject(FIND_BY_ID, params, organizationRowMapper)
+            } catch (EmptyResultDataAccessException ex) {
+                logger.createMessage("${this.class.simpleName}.findById", ORGANIZATION_NOT_FOUND.message)
+                    .warn()
+
+                throw new NotFoundException(ORGANIZATION_NOT_FOUND)
+            } catch (Exception ex) {
+                logger.createMessage("${this.class.simpleName}.findById", ERROR_WHILE_FINDING_ORGANIZATION.message)
+                    .error(ex)
 
                 throw new InternalServerException(ERROR_WHILE_FINDING_ORGANIZATION)
             }

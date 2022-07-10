@@ -19,6 +19,15 @@ class OrganizationResponse {
         organizationResponse
     }
 
+    static OrganizationResponse buildUsing(Organization organization) {
+        OrganizationResponse organizationResponse = new OrganizationResponse()
+        organizationResponse.id = organization.id
+        organizationResponse.name = organization.name
+        organizationResponse.cost = organization.cost
+        organizationResponse.maximumCapacity = organization.maximumCapacity
+        organizationResponse
+    }
+
     def buildWith(Organization organization) {
         this.id = organization.id
         this.name = organization.name

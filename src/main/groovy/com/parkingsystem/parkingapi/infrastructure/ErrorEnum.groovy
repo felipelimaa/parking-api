@@ -9,7 +9,8 @@ enum ErrorEnum {
     FIELD_ORGANIZATION_NAME_NOT_DECLARED("Please inform 'name'"),
     FIELD_ORGANIZATION_COST_NOT_DECLARED("Please inform 'cost'"),
     FIELD_ORGANIZATION_MAXIMUM_CAPACITY_NOT_DECLARED("Please inform 'maximum_capacity'"),
-    ORGANIZATION_NAME_ALREADY_EXISTS("Organization name already exists.")
+    ORGANIZATION_NAME_ALREADY_EXISTS("Organization name already exists."),
+    ORGANIZATION_NOT_FOUND("Organization not found!")
 
     String message
 

@@ -53,6 +53,16 @@ class OrganizationService {
         })
     }
 
+    Mono<OrganizationResponse> findById(String organizationId) {
+        logger.createMessage("${this.class.simpleName}.findById", "Finding organization.")
+            .with("organizationId", organizationId)
+            .info()
+
+        organizationRepository.findById(organizationId).map({
+            OrganizationResponse.buildUsing(it)
+        })
+    }
+
     Function<OrganizationResource, Mono<OrganizationResource>> validateData = { OrganizationResource resource ->
         logger.createMessage("${this.class.simpleName}.validateData", "Validate data.")
             .info()
