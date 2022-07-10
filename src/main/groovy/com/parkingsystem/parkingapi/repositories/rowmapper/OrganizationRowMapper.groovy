@@ -18,7 +18,7 @@ class OrganizationRowMapper implements RowMapper<Organization> {
     @Override
     Organization mapRow(ResultSet rs, int i) throws SQLException {
         Organization org = new Organization()
-        org.id = rs.getString(ORGANIZATION_ID)
+        org.id = rs.getLong(ORGANIZATION_ID)
         org.name = rs.getString(NAME)
         org.cost = rs.getBigDecimal(COST)
         org.maximumCapacity = rs.getInt(MAXIMUM_CAPACITY)

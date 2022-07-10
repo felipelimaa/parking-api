@@ -42,7 +42,7 @@ class OrganizationController {
     }
 
     @GetMapping("/v1/organizations/{organizationId}")
-    Mono<OrganizationResponse> findById(@PathVariable String organizationId) {
+    Mono<OrganizationResponse> findById(@PathVariable Long organizationId) {
         logger.createMessage("${this.class.simpleName}.findById", "Handling GET /v1/organizations/${organizationId}")
             .info()
         organizationService.findById(organizationId)

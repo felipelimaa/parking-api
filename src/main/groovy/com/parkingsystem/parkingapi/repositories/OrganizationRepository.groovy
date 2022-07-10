@@ -54,12 +54,10 @@ class OrganizationRepository {
 
     static final String INSERT = '''
         INSERT INTO Organizations (
-            Organization_ID,
             Name,
             Cost,
             MaximumCapacity
         ) VALUES (
-            CONCAT('TN-', UUID()),
             :Name,
             :Cost,
             :MaximumCapacity
@@ -97,7 +95,7 @@ class OrganizationRepository {
             Organization_ID = :Organization_ID
     '''
 
-    Mono<String> registerOrganization(String name, BigDecimal cost, Integer maximumCapacity) {
+    Mono<Long> registerOrganization(String name, BigDecimal cost, Integer maximumCapacity) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
             def params = new MapSqlParameterSource('Name', name)
@@ -116,7 +114,7 @@ class OrganizationRepository {
                 throw new InternalServerException(ERROR_WHILE_REGISTER_ORGANIZATION)
             }
 
-            keyHolder.key.toString()
+            keyHolder.key.longValue()
         }
     }
 
@@ -134,7 +132,7 @@ class OrganizationRepository {
         }
     }
 
-    Mono<Organization> findById(String organizationId) {
+    Mono<Organization> findById(Long organizationId) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
             def params = [

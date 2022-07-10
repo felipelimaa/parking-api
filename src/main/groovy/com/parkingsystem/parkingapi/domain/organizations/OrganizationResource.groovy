@@ -5,7 +5,7 @@ import groovy.transform.ToString
 @ToString(includeNames = true, includeFields = true, ignoreNulls = true, includePackage = false)
 class OrganizationResource {
 
-    String id
+    Long id
     OrganizationData organizationData
 
     static OrganizationResource buildUsing(OrganizationData organizationData) {

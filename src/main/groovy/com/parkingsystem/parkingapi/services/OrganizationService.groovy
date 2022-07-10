@@ -1,6 +1,5 @@
 package com.parkingsystem.parkingapi.services
 
-import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.infrastructure.exceptions.BadRequestException
@@ -34,7 +33,6 @@ class OrganizationService {
 
         Mono.just(organizationResource)
             .flatMap(validateData)
-            .flatMap(generateId)
             .flatMap(registerOrganization)
     }
 
@@ -53,7 +51,7 @@ class OrganizationService {
         })
     }
 
-    Mono<OrganizationResponse> findById(String organizationId) {
+    Mono<OrganizationResponse> findById(Long organizationId) {
         logger.createMessage("${this.class.simpleName}.findById", "Finding organization.")
             .with("organizationId", organizationId)
             .info()
@@ -108,22 +106,13 @@ class OrganizationService {
         })
     }
 
-    Function<OrganizationResource, Mono<OrganizationResource>> generateId = { OrganizationResource resource ->
-        logger.createMessage("${this.class.simpleName}.generateId", "Generating Organization ID.")
-            .info()
-
-        organizationRepository.generateOrganizationId().map({
-            resource.id = it
-            resource
-        })
-    }
-
     Function<OrganizationResource, Mono<OrganizationResponse>> registerOrganization = { OrganizationResource resource ->
         logger.createMessage("${this.class.simpleName}.registerOrganization", "Register Organization.")
             .with("organizationResource", resource)
             .info()
 
         organizationRepository.registerOrganization(resource.organizationData.name, resource.organizationData.cost, resource.organizationData.maximumCapacity).map({
+            resource.id = it
             OrganizationResponse.buildUsing(resource)
         })
     }
