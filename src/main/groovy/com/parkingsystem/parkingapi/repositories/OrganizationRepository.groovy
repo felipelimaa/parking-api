@@ -1,6 +1,7 @@
 package com.parkingsystem.parkingapi.repositories
 
 import com.parkingsystem.parkingapi.configuration.DatasourceProvider
+import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.infrastructure.exceptions.InternalServerException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
@@ -72,6 +73,16 @@ class OrganizationRepository {
             o.Name = :Name
     '''
 
+    static final String FIND_ALL_ORGANIZATIONS = '''
+        SELECT
+            o.Organization_ID,
+            o.Name,
+            o.Cost,
+            o.MaximumCapacity
+        FROM
+            Organizations o
+    '''
+
     Mono<String> registerOrganization(String name, BigDecimal cost, Integer maximumCapacity) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
@@ -92,6 +103,20 @@ class OrganizationRepository {
             }
 
             keyHolder.key.toString()
+        }
+    }
+
+    Mono<List<Organization>> findAll() {
+        async {
+            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+            try {
+                jdbcTemplate.query(FIND_ALL_ORGANIZATIONS, organizationRowMapper)
+            } catch (Exception e) {
+                logger.createMessage("${this.class.simpleName}.findAll", ERROR_WHILE_FINDING_ORGANIZATION.message)
+                    .error(e)
+
+                throw new InternalServerException(ERROR_WHILE_FINDING_ORGANIZATION)
+            }
         }
     }
 

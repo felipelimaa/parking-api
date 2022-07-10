@@ -19,4 +19,12 @@ class OrganizationResponse {
         organizationResponse
     }
 
+    def buildWith(Organization organization) {
+        this.id = organization.id
+        this.name = organization.name
+        this.cost = organization.cost
+        this.maximumCapacity = organization.maximumCapacity
+        return this
+    }
+
 }

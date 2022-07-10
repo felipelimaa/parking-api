@@ -1,5 +1,6 @@
 package com.parkingsystem.parkingapi.services
 
+import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.infrastructure.exceptions.BadRequestException
@@ -27,10 +28,29 @@ class OrganizationService {
     OrganizationRepository organizationRepository
 
     Mono<OrganizationResponse> doActionsBy(OrganizationResource organizationResource) {
+        logger.createMessage("${this.class.simpleName}.doActionsBy", "Do actions to create Organization.")
+            .with("organizationResource", organizationResource)
+            .info()
+
         Mono.just(organizationResource)
             .flatMap(validateData)
             .flatMap(generateId)
             .flatMap(registerOrganization)
+    }
+
+    Mono<List<OrganizationResponse>> findAll() {
+        logger.createMessage("${this.class.simpleName}.findAll", "Finding all organizations.")
+            .info()
+
+        organizationRepository.findAll().map({
+            List<OrganizationResponse> result = new ArrayList<>()
+            it.forEach{
+                OrganizationResponse organizationResponse = new OrganizationResponse()
+                organizationResponse.buildWith(it)
+                result.add(organizationResponse)
+            }
+            result
+        })
     }
 
     Function<OrganizationResource, Mono<OrganizationResource>> validateData = { OrganizationResource resource ->
