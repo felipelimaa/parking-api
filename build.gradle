@@ -21,8 +21,13 @@ dependencies {
 	implementation 'org.codehaus.groovy:groovy-json'
 	implementation 'org.flywaydb:flyway-core:5.0.4'
 	runtimeOnly 'mysql:mysql-connector-java'
+
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
+	testImplementation 'org.spockframework:spock-spring:2.0-M5-groovy-3.0'
+	testImplementation 'org.assertj:assertj-db:1.2.0'
 }
 
 tasks.named('test') {
