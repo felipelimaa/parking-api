@@ -28,4 +28,17 @@ class UtilizationResponse {
 
     }
 
+    static UtilizationResponse buildUsing(Utilization utilization) {
+        UtilizationResponse response = new UtilizationResponse()
+        response.id = utilization.id
+        response.organization = utilization.organization
+        response.plate = utilization.plate
+        response.brand = utilization.brand
+        response.model = utilization.model
+        response.initialParkingDate = utilization.initialParkingDate
+        response.utilizationStatus = utilization.utilizationStatus
+        response
+
+    }
+
 }

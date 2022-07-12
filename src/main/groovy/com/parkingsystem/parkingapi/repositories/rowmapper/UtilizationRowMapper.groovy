@@ -32,7 +32,7 @@ class UtilizationRowMapper implements RowMapper<Utilization> {
         utilization.id = rs.getLong(UTILIZATION_ID)
         utilization.organization = new Organization(
             id: rs.getLong(ORGANIZATION__ID),
-            name: rs.getLong(ORGANIZATION_NAME),
+            name: rs.getString(ORGANIZATION_NAME),
             cost: rs.getBigDecimal(ORGANIZATION_COST),
             maximumCapacity: rs.getInt(ORGANIZATION_MAXIMUM_CAPACITY)
         )

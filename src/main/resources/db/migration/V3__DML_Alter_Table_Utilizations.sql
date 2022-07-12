@@ -1,0 +1,1 @@
+ALTER TABLE Utilizations CHANGE UpdateAt UpdatedAt DATETIME;

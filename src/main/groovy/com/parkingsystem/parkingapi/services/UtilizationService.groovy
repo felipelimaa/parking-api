@@ -1,6 +1,7 @@
 package com.parkingsystem.parkingapi.services
 
 import com.parkingsystem.parkingapi.domain.organizations.Organization
+import com.parkingsystem.parkingapi.domain.utilizations.Utilization
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationResponse
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationStatus
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
@@ -37,6 +38,16 @@ class UtilizationService {
             .flatMap(handleSuccess)
     }
 
+    Mono<UtilizationResponse> findById(UtilizationResource utilizationResource) {
+        logger.createMessage("${this.class.simpleName}.findById", "Finding Utilization.")
+            .with("utilizationResource", utilizationResource)
+            .info()
+
+        Mono.just(utilizationResource)
+            .flatMap(findOrganization)
+            .flatMap(findUtilization)
+    }
+
     Function<UtilizationResource, Mono<UtilizationResource>> validateData = { UtilizationResource resource ->
         logger.createMessage("${this.class.simpleName}.validateData", "Validate data.")
             .info()
@@ -53,9 +64,23 @@ class UtilizationService {
                 .with("organization", organization)
                 .info()
 
-                resource.organization = organization
-                resource
+            resource.organization = organization
+            resource
         }
+    }
+
+    Function<UtilizationResource, Mono<UtilizationResponse>> findUtilization = { UtilizationResource resource ->
+        logger.createMessage("${this.class.simpleName}.findUtilization", "Searching Utilization.")
+            .with("utilizationResource", resource)
+            .info()
+
+        utilizationRepository.findById(resource.organization.id, resource.id).map({ Utilization utilization ->
+            logger.createMessage("${this.class.simpleName}.findUtilization", "Utilization found.")
+                .with("utilization", utilization)
+                .info()
+
+            UtilizationResponse.buildUsing(utilization)
+        })
     }
 
     Function<UtilizationResource, Mono<UtilizationResource>> registerUtilization = { UtilizationResource resource ->

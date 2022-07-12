@@ -13,7 +13,9 @@ enum ErrorEnum {
     ORGANIZATION_NOT_FOUND("Organization not found!"),
 
     // Utilizations
-    ERROR_WHILE_REGISTER_UTILIZATION('Something went wrong while register Utilization')
+    ERROR_WHILE_REGISTER_UTILIZATION('Something went wrong while register Utilization'),
+    ERROR_WHILE_FINDING_UTILIZATION('Something went wrong while finding Utilization'),
+    UTILIZATION_NOT_FOUND("Utilization not found!")
 
     String message
 

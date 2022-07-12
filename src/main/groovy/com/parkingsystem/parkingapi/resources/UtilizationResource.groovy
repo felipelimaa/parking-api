@@ -18,4 +18,11 @@ class UtilizationResource {
         utilizationResource.utilizationData = utilizationData
         utilizationResource
     }
+
+    static UtilizationResource buildUsing(Long organizationId, Long utilizationId) {
+        UtilizationResource utilizationResource = new UtilizationResource()
+        utilizationResource.id = utilizationId
+        utilizationResource.utilizationData = new UtilizationData(organizationId: organizationId)
+        utilizationResource
+    }
 }
