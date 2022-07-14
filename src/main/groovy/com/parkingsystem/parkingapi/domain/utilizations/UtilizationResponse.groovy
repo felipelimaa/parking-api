@@ -46,4 +46,17 @@ class UtilizationResponse {
 
     }
 
+    def buildWith(Utilization utilization) {
+        this.id = utilization.id
+        this.organization = utilization.organization
+        this.plate = utilization.plate
+        this.brand = utilization.brand
+        this.model = utilization.model
+        this.initialParkingDate = utilization.initialParkingDate
+        this.finishParkingDate = utilization.finishParkingDate
+        this.cost = utilization.cost
+        this.utilizationStatus = utilization.utilizationStatus
+        this
+    }
+
 }

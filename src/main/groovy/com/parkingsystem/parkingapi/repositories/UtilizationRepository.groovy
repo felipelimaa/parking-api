@@ -2,7 +2,6 @@ package com.parkingsystem.parkingapi.repositories
 
 import com.parkingsystem.parkingapi.configuration.DatasourceProvider
 import com.parkingsystem.parkingapi.domain.utilizations.Utilization
-import com.parkingsystem.parkingapi.domain.utilizations.UtilizationStatus
 import com.parkingsystem.parkingapi.infrastructure.exceptions.InternalServerException
 import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
@@ -86,6 +85,30 @@ class UtilizationRepository {
         AND u.Organization_ID   = :Organization__ID
     '''
 
+    static final String FIND_BY_ORGANIZATION = '''
+        SELECT
+            u.Utilization_ID,
+            u.Organization_ID       as Organization__ID,
+            o.Name                  as OrganizationName,
+            o.Cost                  as OrganizationCost,
+            o.MaximumCapacity       as OrganizationMaximumCapacity,
+            u.Plate,
+            u.Brand,
+            u.Model,
+            u.InitialParkingDate,
+            u.FinishParkingDate,
+            u.Cost,
+            u.UtilizationStatus,
+            u.CreatedAt,
+            u.UpdatedAt
+        FROM
+            Utilizations u
+        INNER JOIN
+            Organizations o ON o.Organization_ID = u.Organization_ID
+        WHERE
+            u.Organization_ID   = :Organization__ID
+    '''
+
     Mono<Long> registerUtilization(
         Long organization_ID,
         String plate,
@@ -142,6 +165,23 @@ class UtilizationRepository {
             } catch(Exception ex) {
                 logger.createMessage("${this.class.simpleName}.findById", ERROR_WHILE_FINDING_UTILIZATION.message)
                         .error(ex)
+
+                throw new InternalServerException(ERROR_WHILE_FINDING_UTILIZATION)
+            }
+        }
+    }
+
+    Mono<List<Utilization>> findAll(Long organizationId) {
+        async {
+            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+            def params = [
+                'Organization__ID': organizationId
+            ]
+            try {
+                jdbcTemplate.query(FIND_BY_ORGANIZATION, params, utilizationRowMapper)
+            } catch (Exception e) {
+                logger.createMessage("${this.class.simpleName}.findAll", ERROR_WHILE_FINDING_UTILIZATION.message)
+                        .error(e)
 
                 throw new InternalServerException(ERROR_WHILE_FINDING_UTILIZATION)
             }

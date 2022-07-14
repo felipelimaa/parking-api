@@ -1,13 +1,10 @@
 package com.parkingsystem.parkingapi.application
 
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationData
-import com.parkingsystem.parkingapi.domain.utilizations.UtilizationEventResponse
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationResponse
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
-import com.parkingsystem.parkingapi.resources.UtilizationEventResource
 import com.parkingsystem.parkingapi.resources.UtilizationResource
-import com.parkingsystem.parkingapi.services.UtilizationEventService
 import com.parkingsystem.parkingapi.services.UtilizationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -35,6 +32,15 @@ class UtilizationController {
             .info()
         UtilizationResource utilizationResource = UtilizationResource.buildUsing(utilizationData)
         utilizationService.doActionsBy(utilizationResource)
+    }
+
+    @GetMapping("/v1/utilizations")
+    Mono<List<UtilizationResponse>> findAll(@RequestHeader Long organizationId) {
+        logger.createMessage("${this.class.simpleName}.findAll", "Handling GET /v1/utilizations")
+            .with("organizationId", organizationId)
+            .info()
+
+        utilizationService.findAll(organizationId)
     }
 
     @GetMapping("/v1/utilizations/{utilizationId}")
