@@ -13,6 +13,8 @@ class UtilizationResponse {
     String brand
     String model
     String initialParkingDate
+    String finishParkingDate
+    BigDecimal cost
     UtilizationStatus utilizationStatus
 
     static UtilizationResponse buildUsing(UtilizationResource resource) {
@@ -23,6 +25,8 @@ class UtilizationResponse {
         response.brand = resource.utilizationData.brand
         response.model = resource.utilizationData.model
         response.initialParkingDate = resource.utilizationData.initialParkingDate
+        response.finishParkingDate = resource.utilization.finishParkingDate
+        response.cost = resource.utilization.cost
         response.utilizationStatus = resource.utilizationStatus
         response
     }
@@ -35,6 +39,8 @@ class UtilizationResponse {
         response.brand = utilization.brand
         response.model = utilization.model
         response.initialParkingDate = utilization.initialParkingDate
+        response.finishParkingDate = utilization.finishParkingDate
+        response.cost = utilization.cost
         response.utilizationStatus = utilization.utilizationStatus
         response
 
