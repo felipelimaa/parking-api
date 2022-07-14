@@ -25,7 +25,6 @@ class UtilizationResponse {
         response.initialParkingDate = resource.utilizationData.initialParkingDate
         response.utilizationStatus = resource.utilizationStatus
         response
-
     }
 
     static UtilizationResponse buildUsing(Utilization utilization) {

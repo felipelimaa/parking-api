@@ -4,6 +4,7 @@ import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.domain.utilizations.Utilization
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationResponse
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationStatus
+import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.OrganizationRepository
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 import java.util.function.Function
+
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.FIELD_UTILIZATION_FINISH_PARKING_DATE_NOT_DECLARED
 
 @Service
 class UtilizationService {

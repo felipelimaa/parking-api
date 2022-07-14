@@ -6,4 +6,8 @@ enum UtilizationStatus {
     CLOSED,
     CANCELED
 
+    static UtilizationStatus findByName(String name){
+        return values().find{it.name() == name}
+    }
+
 }
