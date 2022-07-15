@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus
 
 class UnprocessableEntityException extends BusinessException {
 
+    UnprocessableEntityException(){
+        super(null, HttpStatus.UNPROCESSABLE_ENTITY)
+    }
+
     UnprocessableEntityException(String msg) {
         super(msg, HttpStatus.UNPROCESSABLE_ENTITY)
     }

@@ -75,14 +75,14 @@ class UtilizationService {
         logger.createMessage("${this.class.simpleName}.findOrganization", "Searching Organization.")
             .info()
 
-        organizationRepository.findById(resource.utilizationData.organizationId).map{ Organization organization ->
+        organizationRepository.findById(resource.utilizationData.organizationId).map({ Organization organization ->
             logger.createMessage("${this.class.simpleName}.findOrganization", "Organization found.")
                 .with("organization", organization)
                 .info()
 
             resource.organization = organization
             resource
-        }
+        })
     }
 
     Function<UtilizationResource, Mono<UtilizationResponse>> findUtilization = { UtilizationResource resource ->

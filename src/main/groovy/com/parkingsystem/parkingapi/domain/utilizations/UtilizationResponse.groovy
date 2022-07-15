@@ -25,8 +25,6 @@ class UtilizationResponse {
         response.brand = resource.utilizationData.brand
         response.model = resource.utilizationData.model
         response.initialParkingDate = resource.utilizationData.initialParkingDate
-        response.finishParkingDate = resource.utilization.finishParkingDate
-        response.cost = resource.utilization.cost
         response.utilizationStatus = resource.utilizationStatus
         response
     }
