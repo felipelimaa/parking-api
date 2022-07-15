@@ -14,6 +14,8 @@ class OrganizationRowMapper implements RowMapper<Organization> {
     static final String NAME = "Name"
     static final String COST = "Cost"
     static final String MAXIMUM_CAPACITY = "MaximumCapacity"
+    static final String CREATED_AT = "CreatedAt"
+    static final String UPDATED_AT = "UpdatedAt"
 
     @Override
     Organization mapRow(ResultSet rs, int i) throws SQLException {
@@ -22,6 +24,8 @@ class OrganizationRowMapper implements RowMapper<Organization> {
         org.name = rs.getString(NAME)
         org.cost = rs.getBigDecimal(COST)
         org.maximumCapacity = rs.getInt(MAXIMUM_CAPACITY)
+        org.createdAt = rs.getString(CREATED_AT)
+        org.updatedAt = rs.getString(UPDATED_AT)
         org
     }
 }

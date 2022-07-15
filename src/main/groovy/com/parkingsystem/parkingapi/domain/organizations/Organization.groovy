@@ -9,5 +9,7 @@ class Organization {
     String name
     BigDecimal cost
     Integer maximumCapacity
+    String createdAt
+    String updatedAt
 
 }
