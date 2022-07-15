@@ -4,6 +4,7 @@ import com.parkingsystem.parkingapi.domain.organizations.Organization
 import com.parkingsystem.parkingapi.domain.utilizations.Utilization
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationResponse
 import com.parkingsystem.parkingapi.domain.utilizations.UtilizationStatus
+import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.OrganizationRepository
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
 import java.util.function.Function
+
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.CAR_IS_PARKED
 
 @Service
 class UtilizationService {
@@ -34,6 +37,7 @@ class UtilizationService {
         Mono.just(utilizationResource)
             .flatMap(validateData)
             .flatMap(findOrganization)
+            .flatMap(verifyParkedCar)
             .flatMap(registerUtilization)
             .flatMap(handleSuccess)
     }
@@ -96,6 +100,21 @@ class UtilizationService {
                 .info()
 
             UtilizationResponse.buildUsing(utilization)
+        })
+    }
+
+    Function<UtilizationResource, Mono<UtilizationResource>> verifyParkedCar = { UtilizationResource resource ->
+        logger.createMessage("${this.class.simpleName}.verifyParkedCar", "Verify if car is not parked.")
+            .info()
+
+        utilizationRepository.verifyIfCarParked(resource.organization.id, resource.utilizationData.plate).map({
+            if(it.size() > 0) {
+                logger.createMessage("${this.class.simpleName}.verifyParkedCar", CAR_IS_PARKED.message)
+                    .info()
+
+                throw new UnprocessableEntityException(CAR_IS_PARKED)
+            }
+            resource
         })
     }
 
