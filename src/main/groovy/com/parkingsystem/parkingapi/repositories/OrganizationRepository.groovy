@@ -9,6 +9,7 @@ import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationCountRowMapper
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationGenerateIdRowMapper
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationRowMapper
+import com.parkingsystem.parkingapi.utils.DateUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.dao.EmptyResultDataAccessException
@@ -56,11 +57,13 @@ class OrganizationRepository {
         INSERT INTO Organizations (
             Name,
             Cost,
-            MaximumCapacity
+            MaximumCapacity,
+            CreatedAt
         ) VALUES (
             :Name,
             :Cost,
-            :MaximumCapacity
+            :MaximumCapacity,
+            :CreatedAt
         )
     '''
 
@@ -78,7 +81,9 @@ class OrganizationRepository {
             o.Organization_ID,
             o.Name,
             o.Cost,
-            o.MaximumCapacity
+            o.MaximumCapacity,
+            o.CreatedAt,
+            o.UpdatedAt
         FROM
             Organizations o
     '''
@@ -88,7 +93,9 @@ class OrganizationRepository {
             o.Organization_ID,
             o.Name,
             o.Cost,
-            o.MaximumCapacity
+            o.MaximumCapacity,
+            o.CreatedAt,
+            o.UpdatedAt
         FROM
             Organizations o
         WHERE
@@ -101,6 +108,7 @@ class OrganizationRepository {
             def params = new MapSqlParameterSource('Name', name)
             params.addValue('Cost', cost)
             params.addValue('MaximumCapacity', maximumCapacity)
+            params.addValue('CreatedAt', DateUtils.toBrazilGMT())
 
             String[] arr = ['Organization_ID']
             KeyHolder keyHolder = new GeneratedKeyHolder()
