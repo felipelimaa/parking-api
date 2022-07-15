@@ -8,6 +8,7 @@ import com.parkingsystem.parkingapi.fixtures.OrganizationFixture
 import com.parkingsystem.parkingapi.fixtures.UtilizationFixture
 import com.parkingsystem.parkingapi.fixtures.UtilizationResourceFixture
 import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
+import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException
 import com.parkingsystem.parkingapi.repositories.UtilizationRepository
 import com.parkingsystem.parkingapi.resources.UtilizationResource
 import reactor.core.publisher.Mono
@@ -83,6 +84,32 @@ class UtilizationServiceSpec extends Specification {
 
         then:
         thrown(NotFoundException)
+    }
+
+    def 'Should not permit a new utilization if car is parked in same organization'() {
+        given:
+        Utilization utilization = UtilizationFixture.valid()
+        Utilization utilization2 = UtilizationFixture.valid()
+        utilization2.id = 2
+        UtilizationResource resource = UtilizationResourceFixture.valid(utilization.organization)
+
+        and:
+        utilizationRepository.registerUtilization(
+            utilization2.organization.id,
+            utilization2.plate,
+            utilization2.brand,
+            utilization2.model,
+            utilization2.initialParkingDate,
+            utilization2.utilizationStatus.toString()
+        )
+        service.doActionsBy(resource) >> { throw new UnprocessableEntityException() }
+
+        when:
+        service.doActionsBy(resource).block()
+
+        then:
+        thrown(UnprocessableEntityException)
+
     }
 
 }

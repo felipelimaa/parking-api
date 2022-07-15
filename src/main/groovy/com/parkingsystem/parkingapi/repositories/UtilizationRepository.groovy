@@ -109,6 +109,32 @@ class UtilizationRepository {
             u.Organization_ID   = :Organization__ID
     '''
 
+    static final String FIND_IF_PARKED = '''
+        SELECT
+            u.Utilization_ID,
+            u.Organization_ID       as Organization__ID,
+            o.Name                  as OrganizationName,
+            o.Cost                  as OrganizationCost,
+            o.MaximumCapacity       as OrganizationMaximumCapacity,
+            u.Plate,
+            u.Brand,
+            u.Model,
+            u.InitialParkingDate,
+            u.FinishParkingDate,
+            u.Cost,
+            u.UtilizationStatus,
+            u.CreatedAt,
+            u.UpdatedAt
+        FROM
+            Utilizations u
+        INNER JOIN
+            Organizations o ON o.Organization_ID = u.Organization_ID
+        WHERE
+            u.Organization_ID   = :Organization__ID
+        AND u.Plate             = :Plate
+        AND u.UtilizationStatus = 'PARKED'
+    '''
+
     Mono<Long> registerUtilization(
         Long organization_ID,
         String plate,
@@ -164,7 +190,25 @@ class UtilizationRepository {
                 throw new NotFoundException(UTILIZATION_NOT_FOUND)
             } catch(Exception ex) {
                 logger.createMessage("${this.class.simpleName}.findById", ERROR_WHILE_FINDING_UTILIZATION.message)
-                        .error(ex)
+                    .error(ex)
+
+                throw new InternalServerException(ERROR_WHILE_FINDING_UTILIZATION)
+            }
+        }
+    }
+
+    Mono<List<Utilization>> verifyIfCarParked(Long organizationId, String plate) {
+        async {
+            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+            def params = [
+                'Organization__ID': organizationId,
+                'Plate': plate
+            ]
+            try {
+                jdbcTemplate.query(FIND_IF_PARKED, params, utilizationRowMapper)
+            } catch (Exception e) {
+                logger.createMessage("${this.class.simpleName}.findAll", ERROR_WHILE_FINDING_UTILIZATION.message)
+                    .error(e)
 
                 throw new InternalServerException(ERROR_WHILE_FINDING_UTILIZATION)
             }
@@ -181,7 +225,7 @@ class UtilizationRepository {
                 jdbcTemplate.query(FIND_BY_ORGANIZATION, params, utilizationRowMapper)
             } catch (Exception e) {
                 logger.createMessage("${this.class.simpleName}.findAll", ERROR_WHILE_FINDING_UTILIZATION.message)
-                        .error(e)
+                    .error(e)
 
                 throw new InternalServerException(ERROR_WHILE_FINDING_UTILIZATION)
             }
