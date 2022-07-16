@@ -33,18 +33,20 @@ class UtilizationEventRepository {
         SET FinishParkingDate   = :FinishParkingDate,
             Cost                = :Cost,
             UtilizationStatus   = :UtilizationStatus,
+            Duration            = :Duration,
             UpdatedAt           = :UpdatedAt
         WHERE
             Utilization_ID      = :Utilization_ID
     '''
 
-    void updateUtilization(Long utilizationId, String finishParkingDate, BigDecimal cost, String utilizationStatus) {
+    void updateUtilization(Long utilizationId, String finishParkingDate, BigDecimal cost, String utilizationStatus, Integer duration) {
         NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
         def params = [
             'Utilization_ID': utilizationId,
             'FinishParkingDate': finishParkingDate,
             'Cost': cost,
             'UtilizationStatus': utilizationStatus,
+            'Duration': duration,
             'UpdatedAt': DateUtils.toBrazilGMT()
         ]
 

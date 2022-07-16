@@ -75,7 +75,8 @@ class UtilizationRepository {
             u.Cost,
             u.UtilizationStatus,
             u.CreatedAt,
-            u.UpdatedAt
+            u.UpdatedAt,
+            u.Duration
         FROM
             Utilizations u
         INNER JOIN
@@ -100,7 +101,8 @@ class UtilizationRepository {
             u.Cost,
             u.UtilizationStatus,
             u.CreatedAt,
-            u.UpdatedAt
+            u.UpdatedAt,
+            u.Duration
         FROM
             Utilizations u
         INNER JOIN
@@ -124,7 +126,8 @@ class UtilizationRepository {
             u.Cost,
             u.UtilizationStatus,
             u.CreatedAt,
-            u.UpdatedAt
+            u.UpdatedAt,
+            u.Duration
         FROM
             Utilizations u
         INNER JOIN
