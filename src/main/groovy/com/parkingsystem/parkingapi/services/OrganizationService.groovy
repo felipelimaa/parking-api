@@ -7,6 +7,7 @@ import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntit
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.OrganizationRepository
+import com.parkingsystem.parkingapi.resources.OrganizationUpdateResource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -61,6 +62,43 @@ class OrganizationService {
         })
     }
 
+    Mono<OrganizationResponse> doUpdate(OrganizationUpdateResource organizationUpdateResource) {
+        logger.createMessage("${this.class.simpleName}.doUpdate", "Prepare to update organization.")
+            .info()
+
+        Mono.just(organizationUpdateResource)
+            .flatMap(findOrganization)
+            .flatMap(updateOrganization)
+            .flatMap(findOrganization)
+            .flatMap(handleSuccessUpdate)
+    }
+
+    Function<OrganizationUpdateResource, Mono<OrganizationUpdateResource>> findOrganization = { OrganizationUpdateResource resource ->
+        logger.createMessage("${this.class.simpleName}.findOrganization", "Finding organization.")
+            .info()
+
+        organizationRepository.findById(resource.id).map({
+            logger.createMessage("${this.class.simpleName}.findOrganization", "Organization found.")
+                .with('organization', it)
+                .info()
+            resource.organization = it
+            resource
+        })
+    }
+
+    Function<OrganizationUpdateResource, Mono<OrganizationUpdateResource>> updateOrganization = { OrganizationUpdateResource resource ->
+        logger.createMessage("${this.class.simpleName}.updateOrganization", "Updating organization.")
+            .info()
+
+        organizationRepository.updateOrganization(
+            resource.id,
+            resource.organizationUpdateData.cost ? resource.organizationUpdateData.cost : resource.organization.cost,
+            resource.organizationUpdateData.maximumCapacity ? resource.organizationUpdateData.maximumCapacity : resource.organization.maximumCapacity
+        )
+
+        Mono.just(resource)
+    }
+
     Function<OrganizationResource, Mono<OrganizationResource>> validateData = { OrganizationResource resource ->
         logger.createMessage("${this.class.simpleName}.validateData", "Validate data.")
             .info()
@@ -74,14 +112,14 @@ class OrganizationService {
 
         if(!resource.organizationData.cost) {
             logger.createMessage("${this.class.simpleName}.validateData", FIELD_ORGANIZATION_COST_NOT_DECLARED.message)
-                    .warn()
+                .warn()
 
             return Mono.error(new UnprocessableEntityException(FIELD_ORGANIZATION_COST_NOT_DECLARED))
         }
 
         if(!resource.organizationData.maximumCapacity) {
             logger.createMessage("${this.class.simpleName}.validateData", FIELD_ORGANIZATION_MAXIMUM_CAPACITY_NOT_DECLARED.message)
-                    .warn()
+                .warn()
 
             return Mono.error(new UnprocessableEntityException(FIELD_ORGANIZATION_MAXIMUM_CAPACITY_NOT_DECLARED))
         }
@@ -115,6 +153,15 @@ class OrganizationService {
             resource.id = it
             OrganizationResponse.buildUsing(resource)
         })
+    }
+
+    Function<OrganizationUpdateResource, Mono<OrganizationResponse>> handleSuccessUpdate = { OrganizationUpdateResource resource ->
+        logger.createMessage("${this.class.simpleName}.handleSuccessUpdate", "Handle success update.")
+            .with("organizationUpdateResource", resource)
+            .info()
+        OrganizationResponse response = new OrganizationResponse()
+        response.buildWith(resource.organization)
+        Mono.just(response)
     }
 
     private static void throwsException(String msg) {

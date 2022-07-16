@@ -3,16 +3,18 @@ package com.parkingsystem.parkingapi.application
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationData
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
+import com.parkingsystem.parkingapi.domain.organizations.OrganizationUpdateData
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
+import com.parkingsystem.parkingapi.resources.OrganizationUpdateResource
 import com.parkingsystem.parkingapi.services.OrganizationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
@@ -46,6 +48,15 @@ class OrganizationController {
         logger.createMessage("${this.class.simpleName}.findById", "Handling GET /v1/organizations/${organizationId}")
             .info()
         organizationService.findById(organizationId)
+    }
+
+    @PutMapping("/v1/organizations/{organizationId}")
+    Mono<OrganizationResponse> doUpdate(@PathVariable Long organizationId, @RequestBody OrganizationUpdateData data) {
+        logger.createMessage("${this.class.simpleName}.doUpdate", "Handling PUT /v1/organizations/${organizationId}")
+            .info()
+        OrganizationUpdateResource resource = OrganizationUpdateResource.buildUsing(organizationId, data)
+
+        organizationService.doUpdate(resource)
     }
 
 }

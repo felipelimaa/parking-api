@@ -26,6 +26,7 @@ import java.util.concurrent.Callable
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_FINDING_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_GENERATE_ORGANIZATION_ID
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_REGISTER_ORGANIZATION
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_UPDATE_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ORGANIZATION_NOT_FOUND
 
 @Component
@@ -102,6 +103,15 @@ class OrganizationRepository {
             Organization_ID = :Organization_ID
     '''
 
+    static final String UPDATE = '''
+        UPDATE Organizations
+        SET Cost            = :Cost,
+            MaximumCapacity = :MaximumCapacity,
+            UpdatedAt       = :UpdatedAt
+        WHERE
+            Organization_ID = :Organization_ID
+    '''
+
     Mono<Long> registerOrganization(String name, BigDecimal cost, Integer maximumCapacity) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
@@ -162,6 +172,24 @@ class OrganizationRepository {
         }
     }
 
+    void updateOrganization(Long organizationId, BigDecimal cost, Integer maximumCapacity) {
+        NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+        def params = new MapSqlParameterSource("Organization_ID", organizationId)
+            .addValue("Cost", cost)
+            .addValue("MaximumCapacity", maximumCapacity)
+            .addValue("UpdatedAt", DateUtils.toBrazilGMT())
+
+        try {
+            jdbcTemplate.update(UPDATE, params)
+        } catch (Exception ex) {
+            logger.createMessage("${this.class.simpleName}.updateOrganization", ERROR_WHILE_UPDATE_ORGANIZATION.message)
+                .with('organizationId', organizationId)
+                .error(ex)
+
+            throw new InternalServerException(ERROR_WHILE_UPDATE_ORGANIZATION)
+        }
+    }
+
     Mono<String> generateOrganizationId() {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
@@ -194,6 +222,10 @@ class OrganizationRepository {
             }
         }
     }
+
+//    private <T> Mono<T> async(Callable<T> callable) {
+//        return Mono.fromCallable(callable).publishOn(scheduler)
+//    }
 
     private <T> Mono<T> async(Callable<T> callable) {
         return Mono.fromCallable(callable).publishOn(scheduler)
