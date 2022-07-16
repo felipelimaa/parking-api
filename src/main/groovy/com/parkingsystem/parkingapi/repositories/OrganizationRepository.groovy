@@ -7,7 +7,7 @@ import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger
 import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationCountRowMapper
-import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationGenerateIdRowMapper
+
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationRowMapper
 import com.parkingsystem.parkingapi.utils.DateUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,7 +24,6 @@ import reactor.core.scheduler.Scheduler
 import java.util.concurrent.Callable
 
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_FINDING_ORGANIZATION
-import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_GENERATE_ORGANIZATION_ID
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_REGISTER_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_UPDATE_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ORGANIZATION_NOT_FOUND
@@ -44,15 +43,8 @@ class OrganizationRepository {
     OrganizationCountRowMapper organizationCountRowMapper
 
     @Autowired
-    OrganizationGenerateIdRowMapper organizationGenerateIdRowMapper
-
-    @Autowired
     @Qualifier("jdbcScheduler")
     Scheduler scheduler
-
-    static final String GENERATE_ID = '''
-        SELECT CONCAT('TN-', UUID()) as Organization_ID
-    '''
 
     static final String INSERT = '''
         INSERT INTO Organizations (
@@ -190,20 +182,6 @@ class OrganizationRepository {
         }
     }
 
-    Mono<String> generateOrganizationId() {
-        async {
-            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
-            try {
-                jdbcTemplate.queryForObject(GENERATE_ID, null, organizationGenerateIdRowMapper)
-            } catch(Exception e) {
-                logger.createMessage("${this.class.simpleName}.generateOrganizationId", ERROR_WHILE_GENERATE_ORGANIZATION_ID.message)
-                    .error(e)
-
-                throw new InternalServerException(ERROR_WHILE_GENERATE_ORGANIZATION_ID)
-            }
-        }
-    }
-
     Mono<Boolean> findOrganizationByName(String name) {
         async {
             NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
@@ -222,10 +200,6 @@ class OrganizationRepository {
             }
         }
     }
-
-//    private <T> Mono<T> async(Callable<T> callable) {
-//        return Mono.fromCallable(callable).publishOn(scheduler)
-//    }
 
     private <T> Mono<T> async(Callable<T> callable) {
         return Mono.fromCallable(callable).publishOn(scheduler)
