@@ -16,6 +16,7 @@ class UtilizationResponse {
     String finishParkingDate
     BigDecimal cost
     UtilizationStatus utilizationStatus
+    Integer duration
 
     static UtilizationResponse buildUsing(UtilizationResource resource) {
         UtilizationResponse response = new UtilizationResponse()
@@ -40,6 +41,7 @@ class UtilizationResponse {
         response.finishParkingDate = utilization.finishParkingDate
         response.cost = utilization.cost
         response.utilizationStatus = utilization.utilizationStatus
+        response.duration = utilization.duration
         response
 
     }
@@ -54,6 +56,7 @@ class UtilizationResponse {
         this.finishParkingDate = utilization.finishParkingDate
         this.cost = utilization.cost
         this.utilizationStatus = utilization.utilizationStatus
+        this.duration = utilization.duration
         this
     }
 

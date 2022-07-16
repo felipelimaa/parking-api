@@ -124,6 +124,7 @@ class UtilizationEventService {
                 def duration = Duration.between(DateUtils.parseDateTime(resource.utilization.initialParkingDate), LocalDateTime.parse(resource.finishParkingDate)).toHours()
 
                 resource.utilization.cost = resource.organization.cost * (duration > 0 ? duration : 1)
+                resource.utilization.duration = (Integer) duration
             } catch (Exception e) {
                 logger.createMessage("${this.class.simpleName}.calculateCost", ERROR_WHILE_CALCULATE_COST_UTILIZATION.message)
                     .with("utilizationEventResource", resource)
@@ -145,7 +146,8 @@ class UtilizationEventService {
             resource.utilizationId,
             resource.finishParkingDate,
             resource.utilization.cost,
-            resource.utilizationStatus as String
+            resource.utilizationStatus as String,
+            resource.utilization.duration
         )
 
         Mono.just(resource)

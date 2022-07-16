@@ -3,8 +3,6 @@ package com.parkingsystem.parkingapi.domain.utilizations
 import com.parkingsystem.parkingapi.domain.organizations.Organization
 import groovy.transform.ToString
 
-import java.time.LocalDateTime
-
 @ToString(includeNames = true, includeFields = true, ignoreNulls = true, includePackage = false)
 class Utilization {
 
@@ -19,5 +17,6 @@ class Utilization {
     UtilizationStatus utilizationStatus
     String createdAt
     String updatedAt
+    Integer duration
 
 }

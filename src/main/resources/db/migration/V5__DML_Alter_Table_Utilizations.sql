@@ -1,0 +1,1 @@
+ALTER TABLE Utilizations ADD COLUMN Duration INTEGER;

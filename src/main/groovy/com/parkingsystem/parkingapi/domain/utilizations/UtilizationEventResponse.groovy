@@ -15,6 +15,7 @@ class UtilizationEventResponse {
     String finishParkingDate
     BigDecimal cost
     UtilizationStatus utilizationStatus
+    Integer duration
 
     static UtilizationEventResponse buildUsing(Utilization utilization, Organization organization, UtilizationStatus utilizationStatus) {
         UtilizationEventResponse response = new UtilizationEventResponse()
@@ -27,6 +28,7 @@ class UtilizationEventResponse {
         response.finishParkingDate = utilization.finishParkingDate
         response.cost = utilization.cost
         response.utilizationStatus = utilization.utilizationStatus
+        response.duration = utilization.duration
         response
     }
 

@@ -25,6 +25,7 @@ class UtilizationRowMapper implements RowMapper<Utilization> {
     static final String UTILIZATION_STATUS = "UtilizationStatus"
     static final String CREATED_AT = "CreatedAt"
     static final String UPDATED_AT = "UpdatedAt"
+    static final String DURATION = "Duration"
 
     @Override
     Utilization mapRow(ResultSet rs, int rowNum) {
@@ -45,6 +46,7 @@ class UtilizationRowMapper implements RowMapper<Utilization> {
         utilization.utilizationStatus = rs.getString(UTILIZATION_STATUS) ? UtilizationStatus.valueOf(rs.getString(UTILIZATION_STATUS)) : null
         utilization.createdAt = rs.getString(CREATED_AT)
         utilization.updatedAt = rs.getString(UPDATED_AT)
+        utilization.duration = rs.getInt(DURATION)
         utilization
     }
 
