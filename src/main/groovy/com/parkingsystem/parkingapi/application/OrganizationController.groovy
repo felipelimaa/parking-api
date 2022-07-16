@@ -1,7 +1,7 @@
 package com.parkingsystem.parkingapi.application
 
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationData
-import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
+import com.parkingsystem.parkingapi.resources.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationUpdateData
 import com.parkingsystem.parkingapi.infrastructure.logging.Logger

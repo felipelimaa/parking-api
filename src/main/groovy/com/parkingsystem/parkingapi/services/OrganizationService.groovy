@@ -1,6 +1,6 @@
 package com.parkingsystem.parkingapi.services
 
-import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
+import com.parkingsystem.parkingapi.resources.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.infrastructure.exceptions.BadRequestException
 import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException

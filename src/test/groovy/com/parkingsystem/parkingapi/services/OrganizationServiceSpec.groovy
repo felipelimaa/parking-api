@@ -1,7 +1,7 @@
 package com.parkingsystem.parkingapi.services
 
 import com.parkingsystem.parkingapi.domain.organizations.Organization
-import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
+import com.parkingsystem.parkingapi.resources.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.fixtures.OrganizationFixture
 import com.parkingsystem.parkingapi.fixtures.OrganizationResourceFixture

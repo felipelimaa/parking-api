@@ -1,5 +1,6 @@
-package com.parkingsystem.parkingapi.domain.organizations
+package com.parkingsystem.parkingapi.resources
 
+import com.parkingsystem.parkingapi.domain.organizations.OrganizationData
 import groovy.transform.ToString
 
 @ToString(includeNames = true, includeFields = true, ignoreNulls = true, includePackage = false)

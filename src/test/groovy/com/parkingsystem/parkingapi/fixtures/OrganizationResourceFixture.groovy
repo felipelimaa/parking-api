@@ -1,6 +1,6 @@
 package com.parkingsystem.parkingapi.fixtures
 
-import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
+import com.parkingsystem.parkingapi.resources.OrganizationResource
 
 class OrganizationResourceFixture {
 
