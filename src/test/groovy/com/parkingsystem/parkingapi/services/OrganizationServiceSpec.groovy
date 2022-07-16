@@ -5,10 +5,12 @@ import com.parkingsystem.parkingapi.domain.organizations.OrganizationResource
 import com.parkingsystem.parkingapi.domain.organizations.OrganizationResponse
 import com.parkingsystem.parkingapi.fixtures.OrganizationFixture
 import com.parkingsystem.parkingapi.fixtures.OrganizationResourceFixture
+import com.parkingsystem.parkingapi.fixtures.OrganizationUpdateResourceFixture
 import com.parkingsystem.parkingapi.infrastructure.ErrorEnum
 import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
 import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException
 import com.parkingsystem.parkingapi.repositories.OrganizationRepository
+import com.parkingsystem.parkingapi.resources.OrganizationUpdateResource
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
@@ -112,6 +114,21 @@ class OrganizationServiceSpec extends Specification {
 
         then:
         thrown(NotFoundException)
+    }
+
+    def 'Should update organization with success'() {
+        given:
+        OrganizationUpdateResource resource = OrganizationUpdateResourceFixture.valid()
+
+        when:
+        Mono.just(resource).flatMap(service.updateOrganization).block()
+
+        then:
+        1 * organizationRepository.updateOrganization(
+            resource.id,
+            resource.organizationUpdateData.cost,
+            resource.organizationUpdateData.maximumCapacity
+        )
     }
 
 }
