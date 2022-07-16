@@ -50,7 +50,8 @@ class UtilizationEventServiceSpec extends Specification {
             resource.utilization.id,
             resource.finishParkingDate,
             resource.utilization.cost,
-            resource.utilizationStatus.toString()
+            resource.utilizationStatus.toString(),
+            resource.utilization.duration
         )
     }
 
@@ -74,7 +75,8 @@ class UtilizationEventServiceSpec extends Specification {
             resource.utilization.id,
             resource.finishParkingDate,
             resource.utilization.cost,
-            resource.utilizationStatus.toString()
+            resource.utilizationStatus.toString(),
+            resource.utilization.duration
         )
     }
 
