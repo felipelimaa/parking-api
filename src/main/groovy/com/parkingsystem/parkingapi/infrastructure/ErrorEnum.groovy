@@ -12,6 +12,8 @@ enum ErrorEnum {
     FIELD_ORGANIZATION_MAXIMUM_CAPACITY_NOT_DECLARED("Please inform 'maximum_capacity'."),
     ORGANIZATION_NAME_ALREADY_EXISTS("Organization name already exists."),
     ORGANIZATION_NOT_FOUND("Organization not found!"),
+    NOT_EXISTS_SLOT_EMPTY_IN_ORGANIZATION("Not exists slot empty in Organization."),
+    ERROR_WHILE_VERIFY_SPACE_AVAILABLE_IN_ORGANIZATION('Something went wrong while finding space available in Organization.'),
 
     // Utilizations
     ERROR_WHILE_REGISTER_UTILIZATION('Something went wrong while register Utilization.'),

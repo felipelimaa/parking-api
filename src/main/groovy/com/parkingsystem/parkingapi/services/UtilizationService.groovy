@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono
 import java.util.function.Function
 
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.CAR_IS_PARKED
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.NOT_EXISTS_SLOT_EMPTY_IN_ORGANIZATION
 
 @Service
 class UtilizationService {
@@ -38,6 +39,7 @@ class UtilizationService {
             .flatMap(validateData)
             .flatMap(findOrganization)
             .flatMap(verifyParkedCar)
+            .flatMap(verifySpaceInParking)
             .flatMap(registerUtilization)
             .flatMap(handleSuccess)
     }
@@ -132,6 +134,22 @@ class UtilizationService {
         ).map({
             resource.id = it
             resource.utilizationStatus = UtilizationStatus.PARKED
+            resource
+        })
+    }
+
+    Function<UtilizationResource, Mono<UtilizationResource>> verifySpaceInParking = { UtilizationResource resource ->
+        logger.createMessage("${this.class.simpleName}.verifySpaceInParking", "Verify if exists space in parking.")
+            .info()
+
+        organizationRepository.verifyIfSlotInParking(resource.organization.id).map({
+            if(!it) {
+                logger.createMessage("${this.class.simpleName}.verifySpaceInParking", NOT_EXISTS_SLOT_EMPTY_IN_ORGANIZATION.message)
+                    .warn()
+
+                throw new UnprocessableEntityException(NOT_EXISTS_SLOT_EMPTY_IN_ORGANIZATION)
+            }
+
             resource
         })
     }
