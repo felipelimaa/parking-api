@@ -9,6 +9,7 @@ import com.parkingsystem.parkingapi.infrastructure.logging.LoggerFactory
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationCountRowMapper
 
 import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationRowMapper
+import com.parkingsystem.parkingapi.repositories.rowmapper.OrganizationSpaceEmptyRowMapper
 import com.parkingsystem.parkingapi.utils.DateUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -26,6 +27,7 @@ import java.util.concurrent.Callable
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_FINDING_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_REGISTER_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_UPDATE_ORGANIZATION
+import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ERROR_WHILE_VERIFY_SPACE_AVAILABLE_IN_ORGANIZATION
 import static com.parkingsystem.parkingapi.infrastructure.ErrorEnum.ORGANIZATION_NOT_FOUND
 
 @Component
@@ -41,6 +43,9 @@ class OrganizationRepository {
 
     @Autowired
     OrganizationCountRowMapper organizationCountRowMapper
+
+    @Autowired
+    OrganizationSpaceEmptyRowMapper organizationSpaceEmptyRowMapper
 
     @Autowired
     @Qualifier("jdbcScheduler")
@@ -67,6 +72,17 @@ class OrganizationRepository {
             Organizations o
         WHERE
             o.Name = :Name
+    '''
+
+    static final String COUNT_IF_EXISTS_SPACE_EMPTY = '''
+        SELECT
+            if(count(*) < o.MaximumCapacity, "true", "false") as capacityAvailable
+        FROM
+            Utilizations u
+        INNER JOIN Organizations o ON o.Organization_ID = u.Organization_ID
+        WHERE
+            o.Organization_ID       = :Organization_ID
+        AND u.UtilizationStatus     = 'PARKED'
     '''
 
     static final String FIND_ALL_ORGANIZATIONS = '''
@@ -160,6 +176,26 @@ class OrganizationRepository {
                     .error(ex)
 
                 throw new InternalServerException(ERROR_WHILE_FINDING_ORGANIZATION)
+            }
+        }
+    }
+
+    Mono<Boolean> verifyIfSlotInParking(Long organizationId) {
+        async {
+            NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(datasourceProvider.parkingDataSource)
+            def params = [
+                Organization_ID: organizationId
+            ]
+            try {
+                jdbcTemplate.queryForObject(COUNT_IF_EXISTS_SPACE_EMPTY, params, organizationSpaceEmptyRowMapper)
+            } catch (EmptyResultDataAccessException ex) {
+                return true
+            } catch (Exception ex) {
+                logger.createMessage("${this.class.simpleName}.updateOrganization", ERROR_WHILE_VERIFY_SPACE_AVAILABLE_IN_ORGANIZATION.message)
+                    .with('organizationId', organizationId)
+                    .error(ex)
+
+                throw new InternalServerException(ERROR_WHILE_VERIFY_SPACE_AVAILABLE_IN_ORGANIZATION)
             }
         }
     }
