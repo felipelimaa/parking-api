@@ -7,8 +7,10 @@ import com.parkingsystem.parkingapi.domain.utilizations.UtilizationStatus
 import com.parkingsystem.parkingapi.fixtures.OrganizationFixture
 import com.parkingsystem.parkingapi.fixtures.UtilizationFixture
 import com.parkingsystem.parkingapi.fixtures.UtilizationResourceFixture
+import com.parkingsystem.parkingapi.infrastructure.ErrorEnum
 import com.parkingsystem.parkingapi.infrastructure.exceptions.NotFoundException
 import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntityException
+import com.parkingsystem.parkingapi.repositories.OrganizationRepository
 import com.parkingsystem.parkingapi.repositories.UtilizationRepository
 import com.parkingsystem.parkingapi.resources.UtilizationResource
 import reactor.core.publisher.Mono
@@ -19,10 +21,12 @@ class UtilizationServiceSpec extends Specification {
     UtilizationService service
 
     UtilizationRepository utilizationRepository = Mock(UtilizationRepository)
+    OrganizationRepository organizationRepository = Mock(OrganizationRepository)
 
     def setup() {
         service = Spy(UtilizationService)
         service.utilizationRepository = utilizationRepository
+        service.organizationRepository = organizationRepository
     }
 
     def 'Should create Utilization with success'() {
@@ -110,6 +114,42 @@ class UtilizationServiceSpec extends Specification {
         then:
         thrown(UnprocessableEntityException)
 
+    }
+
+    def 'Should verify if slot available in parking without success'() {
+        given:
+        Utilization utilization = UtilizationFixture.valid()
+
+        utilization.organization.maximumCapacity = 0
+        UtilizationResource resource = UtilizationResourceFixture.valid(utilization.organization)
+
+        and:
+        organizationRepository.registerOrganization(resource.organization.name, resource.organization.cost, resource.organization.maximumCapacity)
+
+        when:
+        Mono.just(resource).flatMap(service.verifySpaceInParking).block()
+
+        then:
+        1 * organizationRepository.verifyIfSlotInParking(resource.organization.id) >> Mono.just(false)
+        def e = thrown(Throwable)
+        e.cause instanceof UnprocessableEntityException
+        e.cause.message.contains(ErrorEnum.NOT_EXISTS_SLOT_EMPTY_IN_ORGANIZATION.message)
+    }
+
+    def 'Should verify if slot available in parking with success'() {
+        given:
+        Utilization utilization = UtilizationFixture.valid()
+        UtilizationResource resource = UtilizationResourceFixture.valid(utilization.organization)
+
+        and:
+        organizationRepository.registerOrganization(resource.organization.name, resource.organization.cost, resource.organization.maximumCapacity)
+
+        when:
+        def response = Mono.just(resource).flatMap(service.verifySpaceInParking).block()
+
+        then:
+        1 * organizationRepository.verifyIfSlotInParking(resource.organization.id) >> Mono.just(true)
+        resource == response
     }
 
 }
