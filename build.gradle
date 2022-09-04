@@ -20,6 +20,7 @@ dependencies {
 	implementation 'org.codehaus.groovy:groovy'
 	implementation 'org.codehaus.groovy:groovy-json'
 	implementation 'org.flywaydb:flyway-core:5.0.4'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	runtimeOnly 'mysql:mysql-connector-java'
 
 

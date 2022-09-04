@@ -28,4 +28,22 @@ class UtilizationResourceFixture {
         resource
     }
 
+    static UtilizationResource validatePlate(Organization organization, String plate) {
+        UtilizationResource resource = valid(organization)
+        resource.utilizationData.plate = plate
+        resource
+    }
+
+    static UtilizationResource validateModel(Organization organization, String model) {
+        UtilizationResource resource = valid(organization)
+        resource.utilizationData.model = model
+        resource
+    }
+
+    static UtilizationResource validateBrand(Organization organization, String brand) {
+        UtilizationResource resource = valid(organization)
+        resource.utilizationData.brand = brand
+        resource
+    }
+
 }
