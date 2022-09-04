@@ -74,7 +74,7 @@ class UtilizationService {
         logger.createMessage("${this.class.simpleName}.validateData", "Validate data.")
             .info()
 
-        Mono.just(resource)
+        return new UtilizationValidatorService().validate(resource)
     }
 
     Function<UtilizationResource, Mono<UtilizationResource>> findOrganization = { UtilizationResource resource ->
