@@ -13,6 +13,7 @@ import com.parkingsystem.parkingapi.infrastructure.exceptions.UnprocessableEntit
 import com.parkingsystem.parkingapi.repositories.OrganizationRepository
 import com.parkingsystem.parkingapi.repositories.UtilizationRepository
 import com.parkingsystem.parkingapi.resources.UtilizationResource
+import org.apache.commons.lang3.RandomStringUtils
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
@@ -150,6 +151,25 @@ class UtilizationServiceSpec extends Specification {
         then:
         1 * organizationRepository.verifyIfSlotInParking(resource.organization.id) >> Mono.just(true)
         resource == response
+    }
+
+    def 'Should validate fields on register Utilization'(UtilizationResource resource, String message) {
+        when:
+        Mono.just(resource).flatMap(service.validateData).block()
+
+        then:
+        def e = thrown(Throwable)
+        e.cause instanceof UnprocessableEntityException
+        e.cause.message.contains(message)
+
+        where:
+        resource | message
+        UtilizationResourceFixture.validatePlate(OrganizationFixture.valid(), RandomStringUtils.random(UtilizationValidatorService.PLATE_SIZE + 1, true, true))     | "'plate' size exceeded. Maximum size allowed is: ${UtilizationValidatorService.PLATE_SIZE}."
+        UtilizationResourceFixture.validateModel(OrganizationFixture.valid(), RandomStringUtils.random(UtilizationValidatorService.MODEL_SIZE + 1, true, false))    | "'model' size exceeded. Maximum size allowed is: ${UtilizationValidatorService.MODEL_SIZE}."
+        UtilizationResourceFixture.validateBrand(OrganizationFixture.valid(), RandomStringUtils.random(UtilizationValidatorService.BRAND_SIZE + 1, true, false))    | "'brand' size exceeded. Maximum size allowed is: ${UtilizationValidatorService.BRAND_SIZE}."
+        UtilizationResourceFixture.validatePlate(OrganizationFixture.valid(), null)                                                                                 | "The following fields are missing: plate."
+        UtilizationResourceFixture.validateModel(OrganizationFixture.valid(), null)                                                                                 | "The following fields are missing: model."
+        UtilizationResourceFixture.validateBrand(OrganizationFixture.valid(), null)                                                                                 | "The following fields are missing: brand."
     }
 
 }
